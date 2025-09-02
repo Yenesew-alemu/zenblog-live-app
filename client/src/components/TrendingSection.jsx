@@ -21,7 +21,7 @@ function TrendingSection() {
     const fetchPosts = async () => {
       try {
         // Fetch up to 12 posts for this complex section
-        const response = await axios.get('https://zenblog-api.onrender.com/api/posts?limit=12');
+        const response = await axios.get('http://localhost:5000/api/posts?limit=12');
         if (Array.isArray(response.data)) {
           setPosts(response.data);
         }

@@ -59,7 +59,7 @@ function ManagePostsPage() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const response = await axios.get('https://zenblog-api.onrender.com/api/posts');
+        const response = await axios.get('http://localhost:5000/api/posts');
         setPosts(response.data);
       } catch (err) {
         setError('Failed to fetch posts. Please try again later.');
@@ -85,7 +85,7 @@ function ManagePostsPage() {
         return;
       }
 
-      await axios.delete(`https://zenblog-api.onrender.com/api/posts/${postId}`, {
+      await axios.delete(`http://localhost:5000/api/posts/${postId}`, {
         headers: { 'x-auth-token': token }
       });
 

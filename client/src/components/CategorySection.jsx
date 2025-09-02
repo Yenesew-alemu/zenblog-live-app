@@ -20,7 +20,7 @@ function CategorySection({ categoryId, categoryName }) {
       try {
         setLoading(true);
         // Fetch 10 posts to have enough to fill this complex layout
-        const response = await axios.get(`https://zenblog-api.onrender.com/api/posts?categoryId=${categoryId}&limit=10`);
+        const response = await axios.get(`http://localhost:5000/api/posts?categoryId=${categoryId}&limit=10`);
         if (Array.isArray(response.data)) {
           setPosts(response.data);
         }

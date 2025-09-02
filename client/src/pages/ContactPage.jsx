@@ -14,7 +14,7 @@ function ContactPage() {
     e.preventDefault();
     setFormStatus('loading');
     try {
-      await axios.post('https://zenblog-api.onrender.com/api/contact', formData);
+      await axios.post('http://localhost:5000/api/contact', formData);
       setFormStatus('success');
       setFormData({ name: '', email: '', subject: '', message: '' });
     } catch (error) {

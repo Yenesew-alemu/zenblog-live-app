@@ -16,7 +16,7 @@ function HeroSlider() {
   useEffect(() => {
     const fetchFeaturedPosts = async () => {
       try {
-        const response = await axios.get('https://zenblog-api.onrender.com/api/posts?limit=4');
+        const response = await axios.get('http://localhost:5000/api/posts?limit=4');
         if (Array.isArray(response.data)) {
           setSlides(response.data);
         }

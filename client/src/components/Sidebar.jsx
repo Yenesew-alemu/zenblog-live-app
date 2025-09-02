@@ -21,8 +21,8 @@ function Sidebar() {
       try {
         // Fetch both sets of data in parallel for efficiency
         const [categoriesRes, recentPostsRes] = await Promise.all([
-          axios.get('https://zenblog-api.onrender.com/api/categories'),
-          axios.get('https://zenblog-api.onrender.com/api/posts?limit=5')
+          axios.get('http://localhost:5000/api/categories'),
+          axios.get('http://localhost:5000/api/posts?limit=5')
         ]);
 
         if (Array.isArray(categoriesRes.data)) {

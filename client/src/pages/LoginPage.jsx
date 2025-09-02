@@ -50,7 +50,7 @@ function LoginPage() {
     setLoading(true); // <-- 2. SET LOADING TO TRUE
 
     try {
-      const response = await axios.post('https://zenblog-api.onrender.com/api/auth/login', formData);
+      const response = await axios.post('http://localhost:5000/api/auth/login', formData);
       const { token } = response.data;
       localStorage.setItem('authToken', token);
       navigate('/admin'); // Redirect to the admin dashboard

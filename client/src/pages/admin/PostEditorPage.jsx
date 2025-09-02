@@ -55,7 +55,7 @@ function PostEditorPage() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get('https://zenblog-api.onrender.com/api/categories');
+        const response = await axios.get('http://localhost:5000/api/categories');
         setCategories(response.data);
       } catch (err) {
         console.error('Failed to fetch categories', err);
@@ -72,7 +72,7 @@ function PostEditorPage() {
       setLoading(true); // Start loading state
       const fetchPostData = async () => {
         try {
-          const response = await axios.get(`https://zenblog-api.onrender.com/api/posts/id/${postId}`);
+          const response = await axios.get(`http://localhost:5000/api/posts/id/${postId}`);
           const post = response.data;
           
           // Populate the form fields with the fetched data
@@ -143,10 +143,10 @@ function PostEditorPage() {
     try {
       if (isEditMode) {
         // UPDATE Logic
-        await axios.put(`https://zenblog-api.onrender.com/api/posts/${postId}`, postData, { headers });
+        await axios.put(`http://localhost:5000/api/posts/${postId}`, postData, { headers });
       } else {
         // CREATE Logic
-        await axios.post('https://zenblog-api.onrender.com/api/posts', postData, { headers });
+        await axios.post('http://localhost:5000/api/posts', postData, { headers });
       }
       navigate('/admin/posts'); // Redirect back to the list on success
   // The new, improved catch block

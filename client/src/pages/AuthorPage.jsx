@@ -20,8 +20,8 @@ function AuthorPage() {
       try {
         // Fetch author details and their posts in parallel
         const [authorRes, postsRes] = await Promise.all([
-          axios.get(`https://zenblog-api.onrender.com/api/users/${authorId}`),
-          axios.get(`https://zenblog-api.onrender.com/api/users/${authorId}/posts`)
+          axios.get(`http://localhost:5000/api/users/${authorId}`),
+          axios.get(`http://localhost:5000/api/users/${authorId}/posts`)
         ]);
         
         setAuthor(authorRes.data);

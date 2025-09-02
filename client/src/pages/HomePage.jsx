@@ -12,7 +12,7 @@ function HomePage() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get('https://zenblog-api.onrender.com/api/categories');
+        const response = await axios.get('http://localhost:5000/api/categories');
         if (Array.isArray(response.data)) {
           setCategories(response.data);
         }

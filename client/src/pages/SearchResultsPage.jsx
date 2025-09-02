@@ -22,7 +22,7 @@ function SearchResultsPage() {
     const fetchSearchResults = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`https://zenblog-api.onrender.com/api/search?q=${query}`);
+        const response = await axios.get(`http://localhost:5000/api/search?q=${query}`);
         setSearchResults(response.data);
       } catch (err) {
         setError('Failed to fetch search results.');

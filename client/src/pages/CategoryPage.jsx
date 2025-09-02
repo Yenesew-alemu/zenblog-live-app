@@ -19,14 +19,14 @@ function CategoryPage() {
       if (!categoryId) return;
       setLoading(true);
       try {
-        const response = await axios.get(`https://zenblog-api.onrender.com/api/posts?categoryId=${categoryId}`);
+        const response = await axios.get(`http://localhost:5000/api/posts?categoryId=${categoryId}`);
         if (Array.isArray(response.data)) {
           setPosts(response.data);
           if (response.data.length > 0) {
             setCategoryName(response.data[0].category_name);
           } else {
             // Fetch category name separately if there are no posts
-            const catResponse = await axios.get(`https://zenblog-api.onrender.com/api/categories/${categoryId}`); // Assumes this endpoint exists
+            const catResponse = await axios.get(`http://localhost:5000/api/categories/${categoryId}`); // Assumes this endpoint exists
             setCategoryName(catResponse.data.name);
           }
         }
