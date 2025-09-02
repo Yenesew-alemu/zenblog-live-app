@@ -1,16 +1,14 @@
-// /server/config/db.js (Correct MySQL Version for Local Development)
-
-const mysql = require('mysql2');
+// /server/config/db.js (PostgreSQL Connection String Version)
+const { Pool } = require('pg');
 require('dotenv').config();
 
-const pool = mysql.createPool({
-  host: process.env.DB_HOST,      // Should be 'localhost' from your .env
-  user: process.env.DB_USER,      // Should be 'root'
-  password: process.env.DB_PASSWORD, // Should be your XAMPP/MySQL password
-  database: process.env.DB_NAME,    // Should be 'zenblog_db'
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
+// This configuration is designed to work with Render's Environment Variables
+// It will look for a single DATABASE_URL string.
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    require: true,
+  },
 });
 
-module.exports = pool.promise();
+module.exports = pool;
