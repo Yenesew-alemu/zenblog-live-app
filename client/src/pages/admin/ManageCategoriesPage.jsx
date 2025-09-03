@@ -39,7 +39,7 @@ function ManageCategoriesPage() {
   const fetchCategories = async () => {
     try {
       setLoading(true); // Show loading indicator
-      const response = await axios.get('http://localhost:5000/api/categories');
+      const response = await axios.get('https://zenblog-live-api.onrender.com/api/categories');
       setCategories(response.data);
       setError(''); // Clear previous errors on success
     } catch (err) {
@@ -67,7 +67,7 @@ function ManageCategoriesPage() {
     try {
       const token = localStorage.getItem('authToken');
       await axios.post(
-        'http://localhost:5000/api/categories',
+        'https://zenblog-live-api.onrender.com/api/categories',
         { name: newCategoryName },
         { headers: { 'x-auth-token': token } }
       );
@@ -89,7 +89,7 @@ function ManageCategoriesPage() {
 
     try {
       const token = localStorage.getItem('authToken');
-      await axios.delete(`http://localhost:5000/api/categories/${categoryId}`, {
+      await axios.delete(`https://zenblog-live-api.onrender.com/api/categories/${categoryId}`, {
         headers: { 'x-auth-token': token }
       });
 

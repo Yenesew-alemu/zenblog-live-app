@@ -27,7 +27,7 @@ function SinglePostPage() {
 
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/posts/${slug}`
+          `https://zenblog-live-api.onrender.com/api/posts/${slug}`
         );
         setPost(response.data);
       } catch (err) {
