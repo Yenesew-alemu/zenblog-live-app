@@ -16,7 +16,7 @@ const app = express();
 // This is the "guest list" of URLs that are allowed to make requests to our API.
 const allowedOrigins = [
   // IMPORTANT: You will replace this placeholder with your actual live frontend URL from Render.
-  'https://your-live-frontend-url.onrender.com', 
+  'https://zenblog-live-client.onrender.com/', 
   
   // It's good practice to also include your local development URL for testing.
   'http://localhost:5173'
