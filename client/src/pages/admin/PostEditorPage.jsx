@@ -1,238 +1,180 @@
 // /client/src/pages/admin/PostEditorPage.jsx
 import React, { useState, useEffect } from 'react';
 import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css'; // The Quill editor's styles
+import 'react-quill/dist/quill.snow.css';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
+import LoadingSpinner from '../../components/LoadingSpinner'; // Ensure path is correct
 
 // --- Style Objects ---
-const formStyle = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '20px',
-  marginTop: '20px',
-};
-const inputStyle = { 
-  width: '100%',
-  padding: '10px', 
-  fontSize: '16px',
-  boxSizing: 'border-box' 
-};
-const selectStyle = { 
-  width: '100%',
-  padding: '10px', 
-  fontSize: '16px' 
-};
-const buttonStyle = {
-  padding: '12px 20px',
-  fontSize: '16px',
-  backgroundColor: '#0d6efd',
-  color: 'white',
-  border: 'none',
-  borderRadius: '5px',
-  cursor: 'pointer',
-  alignSelf: 'flex-start',
-};
+const formStyle = { display: 'flex', flexDirection: 'column', gap: '20px', marginTop: '20px' };
+const inputStyle = { width: '100%', padding: '10px', fontSize: '16px', boxSizing: 'border-box' };
+const selectStyle = { width: '100%', padding: '10px', fontSize: '16px' };
+const buttonStyle = { padding: '12px 20px', fontSize: '16px', backgroundColor: '#0d6efd', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', alignSelf: 'flex-start' };
+const imagePreviewStyle = { marginTop: '15px', maxWidth: '200px', height: 'auto', border: '1px solid #ddd', padding: '5px' };
 // --- End Style Objects ---
 
 function PostEditorPage() {
-  // --- This is where ALL state and hooks should be defined ---
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [categories, setCategories] = useState([]);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false); // For loading state
+  
+  // --- NEW STATE FOR IMAGE UPLOADS ---
   const [featuredImageUrl, setFeaturedImageUrl] = useState('');
   const [featuredImagePublicId, setFeaturedImagePublicId] = useState('');
   const [isUploading, setIsUploading] = useState(false);
+  
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
-  const { id: postId } = useParams(); // Get the post ID from the URL parameter
-  const isEditMode = Boolean(postId); // Check if we are in "edit" mode
+  const { id: postId } = useParams();
+  const isEditMode = Boolean(postId);
 
-  // --- Effect 1: Fetch Categories for the dropdown ---
+  const liveApiUrl = 'https://zenblog-live-api.onrender.com'; // Your live API URL
+
+  // Effect for fetching categories
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get('https://zenblog-live-api.onrender.com/api/categories');
+        const response = await axios.get(`${liveApiUrl}/api/categories`);
         setCategories(response.data);
       } catch (err) {
         console.error('Failed to fetch categories', err);
-        setError('Could not load categories. Please try again.');
       }
     };
     fetchCategories();
-  }, []); // Runs once when the component mounts
+  }, []);
 
-  // --- Effect 2: Fetch Existing Post Data for Editing ---
+  // Effect for fetching post data in EDIT mode
   useEffect(() => {
-    // This effect only runs if we are in "edit mode"
     if (isEditMode) {
-      setLoading(true); // Start loading state
+      setLoading(true);
       const fetchPostData = async () => {
         try {
-          const response = await axios.get(`https://zenblog-live-api.onrender.com/api/posts/id/${postId}`);
+          const response = await axios.get(`${liveApiUrl}/api/posts/id/${postId}`);
           const post = response.data;
-          
-          // Populate the form fields with the fetched data
           setTitle(post.title);
           setContent(post.content);
           setCategoryId(post.category_id);
           setFeaturedImageUrl(post.featured_image_url || '');
-        setFeaturedImagePublicId(post.featured_image_public_id || '');
+          setFeaturedImagePublicId(post.featured_image_public_id || '');
         } catch (err) {
-          console.error('Failed to fetch post data', err);
-          setError('Could not load the post data for editing.');
+          setError('Could not load post data for editing.');
         } finally {
-          setLoading(false); // Stop loading state
+          setLoading(false);
         }
       };
       fetchPostData();
     }
-  }, [isEditMode, postId]); // Runs if the mode or ID changes
+  }, [isEditMode, postId]);
 
+  // --- NEW: FUNCTION TO HANDLE IMAGE UPLOAD TO CLOUDINARY ---
   const handleImageUpload = async (file) => {
-  if (!file) return;
-  
-  setIsUploading(true);
-  const formData = new FormData();
-  formData.append('file', file);
-  // Replace with YOUR upload preset name from Cloudinary settings
-  formData.append('upload_preset', 'zenblog'); 
-
-  try {
-    // Replace with YOUR cloud name from Cloudinary dashboard
-    const response = await axios.post(
-      `https://api.cloudinary.com/v1_1/dkkdexejr/image/upload`,
-      formData
-    );
+    if (!file) return;
     
-    // Cloudinary sends back all the image info
-    setFeaturedImageUrl(response.data.secure_url);
-    setFeaturedImagePublicId(response.data.public_id);
-    
-  } catch (error) {
-    console.error("Image upload failed:", error);
-    setError('Image upload failed. Please try again.');
-  } finally {
-    setIsUploading(false);
-  }
-};
+    setIsUploading(true);
+    setError('');
+    const formData = new FormData();
+    formData.append('file', file);
+    // ❗️ IMPORTANT: Replace with YOUR upload preset name
+    formData.append('upload_preset', 'zenblog'); 
 
-  // --- Function: Handle Form Submission ---
+    try {
+      // ❗️ IMPORTANT: Replace with YOUR cloud name
+      const response = await axios.post(
+        `https://api.cloudinary.com/v1_1/dkkdexejr/image/upload`,
+        formData
+      );
+      
+      setFeaturedImageUrl(response.data.secure_url);
+      setFeaturedImagePublicId(response.data.public_id);
+      
+    } catch (error) {
+      console.error("Image upload failed:", error);
+      setError('Image upload failed. Please try again.');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  // --- UPDATED: handleSubmit to include image data ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
     if (!title || !content || !categoryId) {
-      setError('Please fill in all fields.');
+      setError('Please fill in title, content, and category.');
       return;
     }
 
     const token = localStorage.getItem('authToken');
     const postData = { 
-    title, 
-    content, 
-    category_id: categoryId,
-    featured_image_url: featuredImageUrl,
-    featured_image_public_id: featuredImagePublicId
-  };
+      title, 
+      content, 
+      category_id: categoryId,
+      featured_image_url: featuredImageUrl,
+      featured_image_public_id: featuredImagePublicId
+    };
     const headers = { 'x-auth-token': token };
+    const apiUrl = `${liveApiUrl}/api/posts`;
 
     try {
       if (isEditMode) {
-        // UPDATE Logic
-        await axios.put(`https://zenblog-live-api.onrender.com/api/posts/${postId}`, postData, { headers });
+        await axios.put(`${apiUrl}/${postId}`, postData, { headers });
       } else {
-        // CREATE Logic
-        await axios.post('https://zenblog-live-api.onrender.com/api/posts', postData, { headers });
+        await axios.post(apiUrl, postData, { headers });
       }
-      navigate('/admin/posts'); // Redirect back to the list on success
-  // The new, improved catch block
-} catch (err) {
-  // Check if the server sent a specific error message.
-  // The '?' are optional chaining, preventing errors if 'response' or 'data' don't exist.
-  const serverErrorMessage = err.response?.data?.message;
-
-  if (serverErrorMessage) {
-    // If we got a specific message from the server, display it.
-    setError(serverErrorMessage);
-  } else {
-    // Otherwise, show a generic message.
-    const action = isEditMode ? 'update' : 'create';
-    setError(`Failed to ${action} post. Please try again.`);
-  }
-  
-  console.error(err); // Always log the full error for debugging
-}
+      navigate('/admin/posts');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to save post.');
+    }
   };
 
-  // While fetching data in edit mode, show a loading message
-  if (loading) {
-    return <div>Loading editor...</div>;
-  }
+  if (loading && isEditMode) return <LoadingSpinner />;
 
-  // --- JSX for rendering the component ---
   return (
     <div>
       <h1>{isEditMode ? 'Edit Post' : 'Create New Post'}</h1>
       {error && <p style={{ color: 'red' }}>{error}</p>}
       <form onSubmit={handleSubmit} style={formStyle}>
+        {/* Title Field */}
         <div>
           <label htmlFor="title">Title</label>
-          <input
-            type="text"
-            id="title"
-            style={inputStyle}
-            placeholder="Post Title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
+          <input type="text" id="title" style={inputStyle} value={title} onChange={(e) => setTitle(e.target.value)} />
         </div>
-
+        {/* Category Field */}
         <div>
           <label htmlFor="category_id">Category</label>
-          <select
-            id="category_id"
-            style={selectStyle}
-            value={categoryId}
-            onChange={(e) => setCategoryId(e.target.value)}
-          >
+          <select id="category_id" style={selectStyle} value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
             <option value="">Select a Category</option>
-            {categories.map((cat) => (
-              <option key={cat.id} value={cat.id}>
-                {cat.name}
-              </option>
-            ))}
+            {categories.map((cat) => (<option key={cat.id} value={cat.id}>{cat.name}</option>))}
           </select>
         </div>
+        
+        {/* --- NEW: JSX for Image Upload --- */}
         <div>
-  <label htmlFor="image">Featured Image</label>
-  <input 
-    type="file"
-    id="image"
-    accept="image/*" // Only allow image files
-    onChange={(e) => handleImageUpload(e.target.files[0])}
-    style={{ display: 'block', marginTop: '10px' }}
-  />
-  {isUploading && <p>Uploading image...</p>}
-  {/* Image Preview */}
-  {featuredImageUrl && (
-    <div style={{ marginTop: '15px' }}>
-      <img src={featuredImageUrl} alt="Featured preview" style={{ maxWidth: '200px', height: 'auto' }} />
-    </div>
-  )}
-</div>
+          <label htmlFor="image">Featured Image</label>
+          <input 
+            type="file"
+            id="image"
+            accept="image/*"
+            onChange={(e) => handleImageUpload(e.target.files[0])}
+            style={{ display: 'block', marginTop: '10px' }}
+          />
+          {isUploading && <p>Uploading image...</p>}
+          {featuredImageUrl && (
+            <div style={{ marginTop: '15px' }}>
+              <p>Image Preview:</p>
+              <img src={featuredImageUrl} alt="Featured preview" style={imagePreviewStyle} />
+            </div>
+          )}
+        </div>
 
+        {/* Content Field */}
         <div>
           <label>Content</label>
-          <ReactQuill
-            theme="snow"
-            value={content}
-            onChange={setContent}
-            style={{ backgroundColor: 'white' }}
-          />
+          <ReactQuill theme="snow" value={content} onChange={setContent} />
         </div>
         
         <button type="submit" style={buttonStyle}>
